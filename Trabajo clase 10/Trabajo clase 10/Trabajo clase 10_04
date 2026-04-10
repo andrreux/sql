@@ -1,0 +1,74 @@
+-- =========================
+-- ELIMINAR TABLAS (opcional)
+-- =========================
+DROP TABLE IF EXISTS compra;
+DROP TABLE IF EXISTS producto;
+DROP TABLE IF EXISTS cliente;
+
+-- =========================
+-- CREACIÓN DE TABLAS
+-- =========================
+
+-- Cliente
+CREATE TABLE cliente (
+ id_cliente SERIAL PRIMARY KEY,
+ nombre VARCHAR(100) NOT NULL,
+ correo VARCHAR(150) UNIQUE,
+ telefono VARCHAR(20)
+);
+
+-- Producto
+CREATE TABLE producto (
+ id_producto SERIAL PRIMARY KEY,
+ nombre VARCHAR(100) NOT NULL,
+ precio NUMERIC(10,2) NOT NULL,
+ stock INT DEFAULT 0
+);
+
+-- Compra
+-- (Aquí se relaciona cliente con producto)
+CREATE TABLE compra (
+ id_compra SERIAL PRIMARY KEY,
+ id_cliente INT NOT NULL,
+ id_producto INT NOT NULL,
+ cantidad INT NOT NULL,
+ fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+ FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente),
+ FOREIGN KEY (id_producto) REFERENCES producto(id_producto)
+);
+
+-- =========================
+-- INSERTAR DATOS
+-- =========================
+
+-- Clientes
+INSERT INTO cliente (nombre, correo, telefono) VALUES
+('Laura Duarte', 'laura@email.com', '3001234567'),
+('Carlos Pérez', 'carlos@email.com', '3019876543');
+
+-- Productos
+INSERT INTO producto (nombre, precio, stock) VALUES
+('Leche', 4000, 50),
+('Pan', 5000, 30),
+('Cereal', 12000, 20);
+
+-- Compras
+INSERT INTO compra (id_cliente, id_producto, cantidad) VALUES
+(1, 1, 2), -- Laura compra 2 leches
+(1, 3, 1), -- Laura compra 1 cereal
+(2, 2, 3); -- Carlos compra 3 panes
+
+-- =========================
+-- CONSULTA DE PRUEBA
+-- =========================
+
+SELECT 
+ c.nombre AS cliente,
+ p.nombre AS producto,
+ co.cantidad,
+ p.precio,
+ (co.cantidad * p.precio) AS total
+FROM compra co
+JOIN cliente c ON co.id_cliente = c.id_cliente
+JOIN producto p ON co.id_producto = p.id_producto;
